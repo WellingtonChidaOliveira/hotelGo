@@ -1,0 +1,19 @@
+@uri = http://localhost:5000
+###GET
+GET {{uri}}/api/v1/user
+Content-Type: application/json
+
+###GET By ID
+GET {{uri}}/api/v1/user/668344effe32959f05a63951
+Content-Type: application/json
+
+###POST
+POST {{uri}}/api/v1/user
+Content-Type: application/json
+
+{
+    "firstName": "Borked",
+    "lastName": "Goes",
+    "email": "mg@mg.com",
+    "password":"abc@123"
+}
