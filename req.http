@@ -17,3 +17,15 @@ Content-Type: application/json
     "email": "mg@mg.com",
     "password":"abc@123"
 }
+
+###DELETE
+DELETE {{uri}}/api/v1/user/6683481f1fb612fe49f92382
+Content-Type: application/json
+
+###PUT
+PUT {{uri}}/api/v1/user/6683454afe32959f05a63952
+Content-Type: application/json
+
+{
+    "email": "bg@bgl.com"
+}
