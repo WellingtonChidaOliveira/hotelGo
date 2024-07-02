@@ -35,5 +35,7 @@ func main() {
 
 	apiv1.Get("/user", userHandler.HandleGetUsers)    //list users
 	apiv1.Get("/user/:id", userHandler.HandleGetUser) //list user by id
+	apiv1.Post("/user", userHandler.HandlerPostUser)  //create user
+
 	app.Listen(*listenAddr)
 }
