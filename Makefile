@@ -6,3 +6,9 @@ run:build
 
 test: 
 	@go test -v ./...
+
+db-up:
+	@docker-compose up -d
+
+db-down:
+	@docker-compose down
