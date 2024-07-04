@@ -7,22 +7,24 @@ import (
 
 	"github.com/wellingtonchida/hotelreservation/db"
 	"github.com/wellingtonchida/hotelreservation/types"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func main() {
-	ctx := context.Background()
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI))
-	if err != nil {
-		log.Fatal(err)
-	}
+var (
+	client     *mongo.Client
+	roomStore  db.RoomStore
+	hotelStore db.HotelStore
+	ctx        = context.Background()
+)
 
-	hotelStore := db.NewMongoHotelStore(client, db.DBNAME, "hotels")
-	roomStore := db.NewMongoRoomStore(client, db.DBNAME, "rooms")
+func SeedHotel(name, location string, rating int) {
 	hotel := types.Hotel{
-		Name:     "Hotel California",
-		Location: "California",
+		Name:     name,
+		Location: location,
+		Rooms:    []primitive.ObjectID{},
+		Rating:   rating,
 	}
 
 	rooms := []types.Room{
@@ -57,7 +59,24 @@ func main() {
 		fmt.Printf("inserted room: %+v\n", insertRoom)
 	}
 
-	fmt.Printf("inserted hotel: %+v\n", insertedHotel)
+}
 
-	fmt.Println("seeding the database...")
+func main() {
+
+	SeedHotel("Hilton", "New York", 5)
+	SeedHotel("Marriot", "San Francisco", 4)
+	SeedHotel("Sheraton", "Los Angeles", 3)
+}
+
+func init() {
+	var err error
+	client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI))
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := client.Database(db.DBNAME).Drop(ctx); err != nil {
+		log.Fatal(err)
+	}
+	hotelStore = db.NewMongoHotelStore(client, "hotels")
+	roomStore = db.NewMongoRoomStore(client, "rooms", hotelStore)
 }
