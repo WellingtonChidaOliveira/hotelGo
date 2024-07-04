@@ -6,7 +6,7 @@ GET {{uri}}/api/v1/user
 Content-Type: application/json
 
 ###GET By ID
-GET {{uri}}/api/v1/user/668344effe32959f05a63951
+GET {{uri}}/api/v1/user/668664680dd92bf77ae73272
 Content-Type: application/json
 
 ###POST
@@ -25,7 +25,7 @@ DELETE {{uri}}/api/v1/user/6683481f1fb612fe49f92382
 Content-Type: application/json
 
 ###PUT
-PUT {{uri}}/api/v1/user/6683454afe32959f05a63952
+PUT {{uri}}/api/v1/user/668664680dd92bf77ae73272
 Content-Type: application/json
 
 {
@@ -35,5 +35,13 @@ Content-Type: application/json
 
 #hotelAPI
 ###GET
-GET {{uri}}/api/v1/hotels?rating=5
+GET {{uri}}/api/v1/hotels
+Content-Type: application/json
+
+###GET By ID
+GET {{uri}}/api/v1/hotels/66865fb3a5dd7c72c5685f8e
+Content-Type: application/json
+
+###GET Hotel Rooms
+GET {{uri}}/api/v1/hotels/66865fb3a5dd7c72c5685f8e/rooms
 Content-Type: application/json
