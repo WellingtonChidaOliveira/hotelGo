@@ -1,4 +1,6 @@
 @uri = http://localhost:5000
+
+#userAPI
 ###GET
 GET {{uri}}/api/v1/user
 Content-Type: application/json
@@ -29,3 +31,9 @@ Content-Type: application/json
 {
     "email": "bg@bgl.com"
 }
+
+
+#hotelAPI
+###GET
+GET {{uri}}/api/v1/hotels?rating=5
+Content-Type: application/json
