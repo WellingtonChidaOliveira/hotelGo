@@ -25,11 +25,17 @@ func main() {
 	}
 	//handler initialization
 	var (
-		listenAddr   = flag.String("listen", ":5000", "server listen address")
-		userHandler  = api.NewUserHandler(db.NewMongoUserStore(client, db.DBNAME))
-		hotelStore   = db.NewMongoHotelStore(client, "hotels")
-		roomStore    = db.NewMongoRoomStore(client, "rooms", hotelStore)
-		hotelHandler = api.NewHotelHandler(hotelStore, roomStore)
+		listenAddr = flag.String("listen", ":5000", "server listen address")
+		userStore  = db.NewMongoUserStore(client, "users")
+		hotelStore = db.NewMongoHotelStore(client, "hotels")
+		roomStore  = db.NewMongoRoomStore(client, "rooms", hotelStore)
+		store      = &db.Store{
+			Hotel: hotelStore,
+			Room:  roomStore,
+			User:  userStore,
+		}
+		userHandler  = api.NewUserHandler(userStore)
+		hotelHandler = api.NewHotelHandler(store)
 		app          = fiber.New(config)
 		apiv1        = app.Group("/api/v1")
 	)
@@ -46,6 +52,7 @@ func main() {
 	apiv1.Post("/hotels", hotelHandler.HandlePostHotel)
 	apiv1.Put("/hotels/:id", hotelHandler.HandleUpdateHotel)
 	apiv1.Delete("/hotels/:id", hotelHandler.HandleDeleteHotel)
+	apiv1.Get("/hotels/:id/rooms", hotelHandler.HandleGetHotelRooms)
 
 	app.Listen(*listenAddr)
 }

@@ -1,45 +1,46 @@
 package api
 
 import (
-	"log"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/wellingtonchida/hotelreservation/db"
 	"github.com/wellingtonchida/hotelreservation/types"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type HotelHandler struct {
-	hotelStore db.HotelStore
-	roomStore  db.RoomStore
+	store *db.Store
 }
 
-func NewHotelHandler(hs db.HotelStore, rs db.RoomStore) *HotelHandler {
-	return &HotelHandler{hotelStore: hs, roomStore: rs}
-}
-
-type HotelQueryParams struct {
-	Rooms    bool   `json:"rooms"`
-	Rating   int    `json:"rating"`
-	Location string `json:"location"`
+func NewHotelHandler(store *db.Store) *HotelHandler {
+	return &HotelHandler{store: store}
 }
 
 func (h *HotelHandler) HandleGetHotels(c *fiber.Ctx) error {
-	var qparams = HotelQueryParams{}
-	if err := c.QueryParser(&qparams); err != nil {
-		return err
-	}
-	log.Println(qparams)
-	hotels, err := h.hotelStore.GetHotels(c.Context())
+	hotels, err := h.store.Hotel.GetHotels(c.Context())
 	if err != nil {
 		return err
 	}
 	return c.JSON(hotels)
 }
 
+func (h *HotelHandler) HandleGetHotelRooms(c *fiber.Ctx) error {
+	id := c.Params("id")
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	filter := bson.M{"hotel_id": oid}
+	rooms, err := h.store.Room.GetRooms(c.Context(), filter)
+	if err != nil {
+		return err
+	}
+	return c.JSON(rooms)
+}
+
 func (h *HotelHandler) HandleGetHotelByID(c *fiber.Ctx) error {
 	id := c.Params("id")
-	hotel, err := h.hotelStore.GetHotelByID(c.Context(), id)
+	hotel, err := h.store.Hotel.GetHotelByID(c.Context(), id)
 	if err != nil {
 		return err
 	}
@@ -51,7 +52,7 @@ func (h *HotelHandler) HandlePostHotel(c *fiber.Ctx) error {
 	if err := c.BodyParser(&hotel); err != nil {
 		return err
 	}
-	insertedHotel, err := h.hotelStore.InsertHotel(c.Context(), &hotel)
+	insertedHotel, err := h.store.Hotel.InsertHotel(c.Context(), &hotel)
 	if err != nil {
 		return err
 	}
@@ -64,7 +65,7 @@ func (h *HotelHandler) HandleUpdateHotel(c *fiber.Ctx) error {
 	if err := c.BodyParser(&update); err != nil {
 		return err
 	}
-	if err := h.hotelStore.UpdateHotel(c.Context(), bson.M{"_id": id}, update); err != nil {
+	if err := h.store.Hotel.UpdateHotel(c.Context(), bson.M{"_id": id}, update); err != nil {
 		return err
 	}
 	return c.SendStatus(fiber.StatusNoContent)
@@ -72,7 +73,7 @@ func (h *HotelHandler) HandleUpdateHotel(c *fiber.Ctx) error {
 
 func (h *HotelHandler) HandleDeleteHotel(c *fiber.Ctx) error {
 	id := c.Params("id")
-	if err := h.hotelStore.DeleteHotel(c.Context(), id); err != nil {
+	if err := h.store.Hotel.DeleteHotel(c.Context(), id); err != nil {
 		return err
 	}
 	return c.SendStatus(fiber.StatusNoContent)
