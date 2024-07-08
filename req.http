@@ -1,5 +1,15 @@
 @uri = http://localhost:5000
 
+
+###POST AUTH
+POST {{uri}}/api/auth
+Content-Type: application/json
+
+{
+    "email": "jd@jd.com",
+    "password":"passwordasdsad"
+}
+
 #userAPI
 ###GET
 GET {{uri}}/api/v1/user
@@ -12,6 +22,7 @@ Content-Type: application/json
 ###POST
 POST {{uri}}/api/v1/user
 Content-Type: application/json
+x-api-token: 123456
 
 {
     "firstName": "Borked",
@@ -37,6 +48,7 @@ Content-Type: application/json
 ###GET
 GET {{uri}}/api/v1/hotels
 Content-Type: application/json
+x-api-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpkQGpkLmNvbSIsImV4cGlyZXMiOjE3MjA0NDUwMTksImlkIjoiNjY4Njc5NTQ1ZTkzM2Q0N2FjMTVlMDk3In0.HpIzF9UCMjgXcUbTtS-6W_7pTm4UB-77rn7NmA7VmZs
 
 ###GET By ID
 GET {{uri}}/api/v1/hotels/66865fb3a5dd7c72c5685f8e

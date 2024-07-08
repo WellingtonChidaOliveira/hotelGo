@@ -50,6 +50,10 @@ func isEmailValid(email string) bool {
 	return emailRegex.MatchString(email)
 }
 
+func IsValidPassword(encpw, password string) bool {
+	return bcrypt.CompareHashAndPassword([]byte(encpw), []byte(password)) == nil
+}
+
 type User struct {
 	ID                primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"` //for marshalling and unmarshalling
 	FirstName         string             `bson:"firstName" json:"firstName"`
