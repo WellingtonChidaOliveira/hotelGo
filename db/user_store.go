@@ -2,6 +2,8 @@ package db
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log"
 
 	"github.com/wellingtonchida/hotelreservation/types"
@@ -18,8 +20,9 @@ type Dropper interface {
 
 type UserStore interface {
 	Dropper
-	GetUserByID(ctx context.Context, id string) (*types.User, error)
 	GetUsers(ctx context.Context) ([]*types.User, error)
+	GetUserByID(ctx context.Context, id string) (*types.User, error)
+	GetUserByEmail(ctx context.Context, email string) (*types.User, error)
 	InsertUser(ctx context.Context, user *types.User) (*types.User, error)
 	UpdateUser(ctx context.Context, filter bson.M, update types.UpdateParams) error
 	DeleteUser(ctx context.Context, id string) error
@@ -42,6 +45,18 @@ func (s *MongoUserStore) Drop(ctx context.Context) error {
 	return s.collection.Drop(ctx)
 }
 
+func (s *MongoUserStore) GetUsers(ctx context.Context) ([]*types.User, error) {
+	cursor, err := s.collection.Find(ctx, bson.M{})
+	if err != nil {
+		return nil, err
+	}
+	var users []*types.User
+	if err := cursor.All(ctx, &users); err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
 func (s *MongoUserStore) GetUserByID(ctx context.Context, id string) (*types.User, error) {
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -54,16 +69,15 @@ func (s *MongoUserStore) GetUserByID(ctx context.Context, id string) (*types.Use
 	return &user, nil
 }
 
-func (s *MongoUserStore) GetUsers(ctx context.Context) ([]*types.User, error) {
-	cursor, err := s.collection.Find(ctx, bson.M{})
-	if err != nil {
+func (s *MongoUserStore) GetUserByEmail(ctx context.Context, email string) (*types.User, error) {
+	var user types.User
+	if err := s.collection.FindOne(ctx, bson.M{"email": email}).Decode(&user); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("invalid credentials")
+		}
 		return nil, err
 	}
-	var users []*types.User
-	if err := cursor.All(ctx, &users); err != nil {
-		return nil, err
-	}
-	return users, nil
+	return &user, nil
 }
 
 func (s *MongoUserStore) InsertUser(ctx context.Context, user *types.User) (*types.User, error) {
