@@ -7,7 +7,7 @@ Content-Type: application/json
 
 {
     "email": "jd@jd.com",
-    "password":"passwordasdsad"
+    "password":""
 }
 
 #userAPI
@@ -28,7 +28,7 @@ x-api-token: 123456
     "firstName": "Borked",
     "lastName": "Goes",
     "email": "mg@mg.com",
-    "password":"abc@123"
+    "password":""
 }
 
 ###DELETE
