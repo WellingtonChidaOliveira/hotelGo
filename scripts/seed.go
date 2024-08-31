@@ -20,13 +20,15 @@ var (
 	ctx        = context.Background()
 )
 
-func seedUser(fname, lname, email string) {
+func seedUser(fname, lname, email, password string, isAdmin bool) {
 	user, err := types.CreateUserRequestToUser(&types.CreateUserRequest{
 		FirstName: fname,
 		LastName:  lname,
 		Email:     email,
-		Password:  "password",
+		Password:  password,
 	})
+
+	user.IsAdmin = isAdmin
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -86,7 +88,8 @@ func main() {
 	seedHotel("Marriot", "San Francisco", 4)
 	seedHotel("Sheraton", "Los Angeles", 3)
 
-	seedUser("james", "bond", "jd@jd.com")
+	seedUser("james", "bond", "jd@jd.com", "password", false)
+	seedUser("admin", "admin", "admin@admin.com", "Admin@123", true)
 }
 
 func init() {
