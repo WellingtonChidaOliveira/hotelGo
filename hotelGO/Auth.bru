@@ -1,0 +1,22 @@
+meta {
+  name: Auth
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:5000/api/auth
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "jd@jd.com",
+    "password": "password"
+  }
+}
