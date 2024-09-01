@@ -48,7 +48,7 @@ Content-Type: application/json
 ###GET
 GET {{uri}}/api/v1/hotels
 Content-Type: application/json
-x-api-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpkQGpkLmNvbSIsImV4cGlyZXMiOjE3MjA0NDUwMTksImlkIjoiNjY4Njc5NTQ1ZTkzM2Q0N2FjMTVlMDk3In0.HpIzF9UCMjgXcUbTtS-6W_7pTm4UB-77rn7NmA7VmZs
+x-api-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpkQGpkLmNvbSIsImV4cGlyZXMiOjE3MjQwMTA2MzUsImlkIjoiNjZjMjE3YWYyYWRjYjJjZTMzMjNjNzJiIn0.taPy93hfHEU9-Wsk6e6vw3Yay4KHzMo5-iBIcJIEJxQ
 
 ###GET By ID
 GET {{uri}}/api/v1/hotels/66865fb3a5dd7c72c5685f8e
@@ -57,3 +57,16 @@ Content-Type: application/json
 ###GET Hotel Rooms
 GET {{uri}}/api/v1/hotels/66865fb3a5dd7c72c5685f8e/rooms
 Content-Type: application/json
+
+
+#book room
+###POST
+POST {{uri}}/api/v1/room/66c217ae2adcb2ce3323c71d/book
+Content-Type: application/json
+x-api-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpkQGpkLmNvbSIsImV4cGlyZXMiOjE3MjQwMTA2MzUsImlkIjoiNjZjMjE3YWYyYWRjYjJjZTMzMjNjNzJiIn0.taPy93hfHEU9-Wsk6e6vw3Yay4KHzMo5-iBIcJIEJxQ
+
+{
+    "numberPersons": 2,
+    "fromDate": "2021-06-01",
+    "tillDate": "2021-06-10"
+}

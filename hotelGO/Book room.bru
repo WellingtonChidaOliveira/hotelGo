@@ -1,0 +1,19 @@
+meta {
+  name: Book room
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:5000/api/v1/room/66d3348e1d27f6ea8bfb0f05/book
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "numberPersons": 1,
+    "fromDate": "2024-09-21T00:00:00.0Z",
+    "tillDate": "2024-09-30T00:00:00.0Z"
+  }
+}

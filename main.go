@@ -26,21 +26,27 @@ func main() {
 	}
 	//handler initialization
 	var (
-		listenAddr = flag.String("listen", ":5000", "server listen address")
-		userStore  = db.NewMongoUserStore(client, "users")
-		hotelStore = db.NewMongoHotelStore(client, "hotels")
-		roomStore  = db.NewMongoRoomStore(client, "rooms", hotelStore)
-		store      = &db.Store{
-			Hotel: hotelStore,
-			Room:  roomStore,
-			User:  userStore,
+		listenAddr  = flag.String("listen", ":5000", "server listen address")
+		userStore   = db.NewMongoUserStore(client, "users")
+		hotelStore  = db.NewMongoHotelStore(client, "hotels")
+		roomStore   = db.NewMongoRoomStore(client, "rooms", hotelStore)
+		bookinStore = db.NewMongoBookingStore(client, "booking", roomStore)
+
+		store = &db.Store{
+			Hotel:   hotelStore,
+			Room:    roomStore,
+			User:    userStore,
+			Booking: bookinStore,
 		}
-		userHandler  = api.NewUserHandler(userStore)
-		hotelHandler = api.NewHotelHandler(store)
-		authHandler  = api.NewAuthHandler(userStore)
-		app          = fiber.New(config)
-		auth         = app.Group("/api")
-		apiv1        = app.Group("/api/v1", middleware.JWTAuthentication)
+		userHandler    = api.NewUserHandler(userStore)
+		hotelHandler   = api.NewHotelHandler(store)
+		authHandler    = api.NewAuthHandler(userStore)
+		roomHandler    = api.NewRoomHandler(store)
+		bookingHandler = api.NewBookingHandler(store)
+		app            = fiber.New(config)
+		auth           = app.Group("/api")
+		apiv1          = app.Group("/api/v1", middleware.JWTAuthentication(userStore))
+		admin          = apiv1.Group("/admin", middleware.AdminAuth)
 	)
 	flag.Parse()
 
@@ -59,5 +65,12 @@ func main() {
 	apiv1.Delete("/hotels/:id", hotelHandler.HandleDeleteHotel)
 	apiv1.Get("/hotels/:id/rooms", hotelHandler.HandleGetHotelRooms)
 
+	apiv1.Get("/rooms", roomHandler.HandleGetRooms)
+	apiv1.Post("/room/:id/book", roomHandler.HandleBookRoom)
+	//TODO: cancel booking
+
+	admin.Get("/bookings", bookingHandler.HandleGetBookings)
+	apiv1.Get("/bookings/:id", bookingHandler.HandleGetBooking)
+	apiv1.Post("/bookings/:id/cancel", bookingHandler.HandleCancelBooking)
 	app.Listen(*listenAddr)
 }

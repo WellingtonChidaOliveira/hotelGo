@@ -1,0 +1,19 @@
+meta {
+  name: Get rooms
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://localhost:5000/api/v1/rooms
+  body: none
+  auth: none
+}
+
+body:json {
+  {
+    "numberPersons": 2,
+    "fromDate": "2024-09-04T00:00:00.0Z",
+    "tillDate": "2024-09-05T00:00:00.0Z"
+  }
+}
