@@ -2,7 +2,6 @@ package api
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -10,38 +9,21 @@ import (
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/wellingtonchida/hotelreservation/db"
-	"github.com/wellingtonchida/hotelreservation/types"
+	"github.com/wellingtonchida/hotelreservation/db/fixtures"
 )
 
-func makeTestUser(t *testing.T, userStore db.UserStore) *types.User {
-	user, err := types.CreateUserRequestToUser(&types.CreateUserRequest{
-		FirstName: "John",
-		LastName:  "Doe",
-		Email:     "jgh@jgh.com",
-		Password:  "password",
-	})
-	if err != nil {
-		return nil
-	}
-	_, err = userStore.InsertUser(context.TODO(), user)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return user
-}
 func TestAuthenticateSuccess(t *testing.T) {
 	tbd := setup(t)
 	defer tbd.teardown(t)
-	insertedUser := makeTestUser(t, tbd.UserStore)
+	insertedUser := fixtures.AddUser(tbd.Store, "Thomas", "Shelby", false)
 
 	app := fiber.New()
-	authHandler := NewAuthHandler(tbd.UserStore)
+	authHandler := NewAuthHandler(tbd.User)
 	app.Post("/auth", authHandler.HandleAuthenticate)
 
 	params := AuthParams{
-		Email:    "jgh@jgh.com",
-		Password: "password",
+		Email:    insertedUser.Email,
+		Password: "Thomas_Shelby",
 	}
 	b, _ := json.Marshal(params)
 	req := httptest.NewRequest("POST", "/auth", bytes.NewReader(b))
@@ -71,21 +53,21 @@ func TestAuthenticateSuccess(t *testing.T) {
 	//The password is not returned in the response
 	insertedUser.EncryptedPassword = ""
 	if !reflect.DeepEqual(insertedUser, authResp.User) {
-		t.Fatalf("expected the user to be the inserted user")
+		t.Fatalf("expected the user -> %+v \n to be the inserted user -> %+v", insertedUser, authResp.User)
 	}
 }
 
 func TestAuthenticateWithWrongPasswordFailure(t *testing.T) {
 	tbd := setup(t)
 	defer tbd.teardown(t)
-	makeTestUser(t, tbd.UserStore)
+	fixtures.AddUser(tbd.Store, "John", "Doe", false)
 
 	app := fiber.New()
-	authHandler := NewAuthHandler(tbd.UserStore)
+	authHandler := NewAuthHandler(tbd.User)
 	app.Post("/auth", authHandler.HandleAuthenticate)
 
 	params := AuthParams{
-		Email:    "jgh@jgh.com",
+		Email:    "Doe@John.com",
 		Password: "passworddsds",
 	}
 	b, _ := json.Marshal(params)
@@ -97,7 +79,7 @@ func TestAuthenticateWithWrongPasswordFailure(t *testing.T) {
 	}
 
 	if resp.StatusCode != http.StatusUnauthorized {
-		t.Fatalf("expected status code 200, got %d", resp.StatusCode)
+		t.Fatalf("expected status code 401, got %d", resp.StatusCode)
 	}
 
 	var genericResp genericResp

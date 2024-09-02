@@ -27,10 +27,10 @@ func main() {
 	//handler initialization
 	var (
 		listenAddr  = flag.String("listen", ":5000", "server listen address")
-		userStore   = db.NewMongoUserStore(client, "users")
-		hotelStore  = db.NewMongoHotelStore(client, "hotels")
-		roomStore   = db.NewMongoRoomStore(client, "rooms", hotelStore)
-		bookinStore = db.NewMongoBookingStore(client, "booking", roomStore)
+		userStore   = db.NewMongoUserStore(client, db.DBNAME, "users")
+		hotelStore  = db.NewMongoHotelStore(client, db.DBNAME, "hotels")
+		roomStore   = db.NewMongoRoomStore(client, db.DBNAME, "rooms", hotelStore)
+		bookinStore = db.NewMongoBookingStore(client, db.DBNAME, "booking", roomStore)
 
 		store = &db.Store{
 			Hotel:   hotelStore,

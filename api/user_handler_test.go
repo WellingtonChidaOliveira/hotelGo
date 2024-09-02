@@ -2,48 +2,20 @@ package api
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/wellingtonchida/hotelreservation/db"
 	"github.com/wellingtonchida/hotelreservation/types"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
-
-const (
-	testdburi = "mongodb://localhost:27017"
-	dbname    = "hotel-reservation-test"
-)
-
-type testdb struct {
-	db.UserStore
-}
-
-func (tdb *testdb) teardown(t *testing.T) {
-	if err := tdb.UserStore.Drop(context.TODO()); err != nil {
-		t.Fatal(err)
-	}
-}
-
-func setup(t *testing.T) *testdb {
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(testdburi))
-	if err != nil {
-		t.Fatal(err)
-	}
-	return &testdb{db.NewMongoUserStore(client, dbname)}
-
-}
 
 func TestPostUser(t *testing.T) {
 	tdb := setup(t)
 	defer tdb.teardown(t)
 
 	app := fiber.New()
-	UserHandler := NewUserHandler(tdb.UserStore)
+	UserHandler := NewUserHandler(tdb.User)
 	app.Post("/", UserHandler.HandlerPostUser)
 
 	params := types.CreateUserRequest{
